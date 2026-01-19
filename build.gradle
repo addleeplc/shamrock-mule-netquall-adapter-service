@@ -73,7 +73,9 @@ shamrock {
 def core_module = project(":${rootProject.name}-core")
 def rs_module = project(":${rootProject.name}-rs")
 
-def monaco_version = '3.4-SNAPSHOT'
+def monaco_version = '3.4.1-SNAPSHOT'
+def integration_adapter_commons_version = '2.1-SNAPSHOT'
+def integration_adapter_commons_name = 'shamrock-affiliates-integration-commons'
 
 configure([core_module, rs_module]) {
     apply(plugin: 'java')
@@ -122,6 +124,8 @@ configure(core_module) {
         compile(group: 'com.haulmont.monaco', name: 'monaco-redis', version: "$monaco_version")
         compile(group: 'com.haulmont.monaco', name: 'monaco-rs', version: "$monaco_version")
         compile(group: 'com.haulmont.monaco', name: 'monaco-unirest', version: "$monaco_version")
+
+        compile(group: 'com.haulmont.shamrock', name: "${integration_adapter_commons_name}-core", version: "$integration_adapter_commons_version")
     }
 
     task deploy(dependsOn: assemble, type: ShamrockDeployJettyTask) {
@@ -141,6 +145,8 @@ configure(rs_module) {
         extraLibs(group: 'com.haulmont.monaco', name: 'monaco-rs', version: "$monaco_version") {
             transitive = false
         }
+
+        compile(group: 'com.haulmont.shamrock', name: "${integration_adapter_commons_name}-rs", version: "$integration_adapter_commons_version")
     }
 
     jar {

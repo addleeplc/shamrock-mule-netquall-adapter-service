@@ -11,7 +11,7 @@
     <context-param>
         <param-name>appPropertiesConfig</param-name>
         <param-value>
-            ${jetty.base}/conf/shamrock-mule-netquall-adapter-service/app.properties
+            ${jetty.base}/conf/shamrock-netquall-adapter-service/app.properties
         </param-value>
     </context-param>
 
@@ -20,12 +20,22 @@
     </listener>
 
     <servlet>
-        <servlet-name>com.haulmont.shamrock.mule.netquall.adapter.ServiceApplication</servlet-name>
+        <servlet-name>com.haulmont.shamrock.affiliate.affiliate_api.AffiliateServiceApplication</servlet-name>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>com.haulmont.shamrock.mule.netquall.adapter.ServiceApplication</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <servlet-name>com.haulmont.shamrock.affiliate.affiliate_api.AffiliateServiceApplication</servlet-name>
+        <url-pattern>/affiliate/api/*</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>com.haulmont.shamrock.affiliate.netquall.NetquallServiceApplication</servlet-name>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>com.haulmont.shamrock.affiliate.netquall.NetquallServiceApplication</servlet-name>
+        <url-pattern>/netquall/api/*</url-pattern>
     </servlet-mapping>
 
     <session-config>

@@ -12,7 +12,15 @@
 
     <property name="monaco-rs.level.MaskingLoggerInterceptor" value="DEBUG"/>
 
-    <logger name="com.haulmont.shamrock.mule.netquall.adapter" level="debug">
+    <logger name="com.haulmont.shamrock.affiliate.integrations.rs" level="DEBUG">
+        <appender-ref ref="MONACO_APP"/>
+    </logger>
+
+    <logger name="com.haulmont.shamrock.affiliate.integrations.rs.affiliates_api.mappers" level="DEBUG">
+        <appender-ref ref="MONACO_APP"/>
+    </logger>
+
+    <logger name="com.haulmont.shamrock.affiliate.netquall" level="DEBUG">
         <appender-ref ref="MONACO_APP"/>
     </logger>
 

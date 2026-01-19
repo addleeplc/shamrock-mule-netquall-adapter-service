@@ -1,7 +1,6 @@
-package com.haulmont.shamrock.mule.netquall.adapter;
+package com.haulmont.shamrock.affiliate.netquall;
 
 import com.haulmont.monaco.config.annotations.Config;
-import com.haulmont.monaco.config.annotations.Property;
 import org.picocontainer.annotations.Component;
 
 @Config

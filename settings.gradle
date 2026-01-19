@@ -4,9 +4,19 @@
  * Use is subject to license terms.
  */
 
-rootProject.name = 'shamrock-mule-netquall-adapter-service'
+rootProject.name = 'shamrock-netquall-adapter-service'
 
 include(":${rootProject.name}-core", ":${rootProject.name}-rs")
 
 project(":${rootProject.name}-core").projectDir = new File(settingsDir, 'modules/core')
 project(":${rootProject.name}-rs").projectDir = new File(settingsDir, 'modules/rs')
+
+
+//def integration_adapter_commons_name = 'shamrock-affiliates-integration-commons'
+//
+//includeBuild('../shamrock-affiliates-integration-services-commons_new') {
+//    dependencySubstitution {
+//        substitute module("com.haulmont.shamrock:${integration_adapter_commons_name}-core") using project(":${integration_adapter_commons_name}-core")
+//        substitute module("com.haulmont.shamrock:${integration_adapter_commons_name}-rs") using project(":${integration_adapter_commons_name}-rs")
+//    }
+//}
