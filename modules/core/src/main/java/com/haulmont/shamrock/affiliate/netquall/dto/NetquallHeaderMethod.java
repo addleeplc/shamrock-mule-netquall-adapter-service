@@ -28,7 +28,8 @@ public enum NetquallHeaderMethod {
     PROVIDER_CANCEL("ProviderCancel"),
     PROVIDER_RESERVATION_UPDATE("ProviderReservationUpdate"),
     AUDIT_RESPONSE("AuditResponse"),
-    ;
+    PAYMENT_STATUS_CALLBACK("PaymentStatusCallback"),
+    STATUS_UPDATES_CALLBACK("StatusUpdatesCallback");
 
     private String code;
     NetquallHeaderMethod(String code) {

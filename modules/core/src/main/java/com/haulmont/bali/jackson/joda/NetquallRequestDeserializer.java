@@ -49,6 +49,12 @@ public class NetquallRequestDeserializer extends JsonDeserializer<NetquallReques
             case AUDIT_RESPONSE:
                 targetClass = NetquallAuditRequest.class;
                 break;
+            case PAYMENT_STATUS_CALLBACK:
+                targetClass = NetquallPaymentStatusCallback.class;
+                break;
+            case STATUS_UPDATES_CALLBACK:
+                targetClass = NetquallStatusUpdatesCallback.class;
+                break;
             default:
                 throw new IllegalArgumentException("Unknown Header.Method: " + methodTxt);
         }

@@ -49,19 +49,19 @@ public class NetquallIntegratorApiResource extends AbstractIntegrationResource {
         NetquallHeader header = request.getHeader();
         switch (header.getMethod()) {
             case GET_QUOTE:
-                //NetquallQuoteRequest quoteRequest = JsonSerializer.getInstance().readValue(body, NetquallQuoteRequest.class);
                 return adapterService.getQuote(getIntegrationContext(), (NetquallQuoteRequest) request);
             case RESERVE:
             case PROVIDER_RESERVATION_UPDATE:
-                //NetquallBookingRequest netquallBookingRequest = JsonSerializer.getInstance().readValue(body, NetquallBookingRequest.class);
                 return adapterService.createOrAmendBooking(getIntegrationContext(), header.getMethod(), (NetquallBookingRequest) request);
             case CANCEL_RESERVATION:
             case PROVIDER_CANCEL:
-                //NetquallProviderCancelRequest netquallCancelRequest = JsonSerializer.getInstance().readValue(body, NetquallProviderCancelRequest.class);
                 return adapterService.cancelBooking(getIntegrationContext(), (NetquallProviderCancelRequest) request);
             case AUDIT_RESPONSE:
-                //NetquallAuditRequest netquallAuditRequest = JsonSerializer.getInstance().readValue(body, NetquallAuditRequest.class);
                 return adapterService.postAudit(getIntegrationContext(), (NetquallAuditRequest) request);
+            case PAYMENT_STATUS_CALLBACK:
+                return adapterService.postPaymentStatusCallback(getIntegrationContext(), (NetquallPaymentStatusCallback) request);
+            case STATUS_UPDATES_CALLBACK:
+                return adapterService.postStatusUpdatesCallback(getIntegrationContext(), (NetquallStatusUpdatesCallback) request);
         }
         throw new ServiceException(ErrorCode.BAD_REQUEST);
     }

@@ -58,7 +58,7 @@ public class BookingConverter {
         request.setBookingData(new NetquallBookingData());
         NetquallBookingData bookingData = request.getBookingData();
 
-        bookingData.setBookingNo(affiliateRequest.getBookingReference().getNumber());
+        bookingData.setBookingNo(affiliateRequest.getBookingReference().getId());
         bookingData.setRefBookingNo(affiliateRequest.getVendorReference().getId());
         bookingData.setDateTimeLocal(DateTime.now());
     }
@@ -231,6 +231,7 @@ public class BookingConverter {
         NetquallRate rate = bookingData.getRates();
         BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
 
+        //TODO
         rate.setBaseFare(receipt.getBaseFare());
         totalPrice = totalPrice.add(receipt.getBaseFare());
 

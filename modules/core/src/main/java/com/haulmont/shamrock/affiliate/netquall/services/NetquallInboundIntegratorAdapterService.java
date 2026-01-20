@@ -173,4 +173,16 @@ public class NetquallInboundIntegratorAdapterService {
         );
     }
 
+    public NetquallResponse postStatusUpdatesCallback(IntegrationContext ctx, NetquallStatusUpdatesCallback updatesCallback) {
+        NetquallResponse response = new NetquallResponse();
+        response.setMessage("Ok");
+        return response;
+    }
+
+    public NetquallResponse postPaymentStatusCallback(IntegrationContext ctx, NetquallPaymentStatusCallback paymentStatusCallback) {
+        NetquallResponse response = new NetquallResponse();
+        response.setMessage("Ok");
+        return response;
+    }
+
 }

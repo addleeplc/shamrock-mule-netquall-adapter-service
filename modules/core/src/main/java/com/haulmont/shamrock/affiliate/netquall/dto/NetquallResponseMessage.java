@@ -12,6 +12,8 @@ import com.haulmont.shamrock.affiliate.integrations.core.dto.AbstractJsonEntity;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY, getterVisibility = JsonAutoDetect.Visibility.NONE, setterVisibility = JsonAutoDetect.Visibility.NONE)
 public class NetquallResponseMessage extends AbstractJsonEntity {
+    @JsonProperty("Status")
+    private NetquallStatus status;
     @JsonProperty("message")
     private String message;
     @JsonProperty("Message")
@@ -24,6 +26,14 @@ public class NetquallResponseMessage extends AbstractJsonEntity {
     private NetquallErrorType errorType;
     @JsonProperty("isRejected")
     private String rejected;
+
+    public NetquallStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(NetquallStatus status) {
+        this.status = status;
+    }
 
     public String getMessage() {
         return message;
