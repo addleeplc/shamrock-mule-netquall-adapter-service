@@ -41,7 +41,7 @@ public class NetquallIntegratorApiResource extends AbstractIntegrationResource {
     }
 
     @POST
-    @Path("/endpoints")
+    @Path("/")
     public NetquallResponse postRequest(/*InputStream requestBodyStream*/ NetquallRequest request) throws IOException {
 //        String body = IOUtils.toString(requestBodyStream, StandardCharsets.UTF_8);
 //        NetquallRequest request = JsonSerializer.getInstance().readValue(body, NetquallRequest.class);

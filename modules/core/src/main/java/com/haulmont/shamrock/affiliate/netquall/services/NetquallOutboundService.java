@@ -96,7 +96,7 @@ public class NetquallOutboundService {
 
         @Override
         protected Path getPath() {
-            return new Path("/statuses");
+            return new Path("/");
         }
     }
 

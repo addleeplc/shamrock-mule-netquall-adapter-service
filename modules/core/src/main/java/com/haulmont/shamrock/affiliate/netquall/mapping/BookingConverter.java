@@ -22,7 +22,7 @@ import com.haulmont.shamrock.affiliate.integrations.core.affiliates_api.dto.resp
 import com.haulmont.shamrock.affiliate.integrations.core.affiliates_api.dto.resp.EstimatesResponse;
 import com.haulmont.shamrock.affiliate.integrations.core.affiliates_api.dto.resp.Response;
 import com.haulmont.shamrock.affiliate.integrations.core.affiliates_api.exceptions.AffiliatesApiException;
-import com.haulmont.shamrock.affiliate.integrations.core.services.DriverCacheService;
+import com.haulmont.shamrock.affiliate.integrations.core.services.BookingRegistryService;
 import com.haulmont.shamrock.affiliate.integrations.core.services.dto.affiliates_registry.NetquallApiAdapterSettings;
 import com.haulmont.shamrock.affiliate.integrations.core.utils.AffiliateApiUtils;
 import com.haulmont.shamrock.affiliate.netquall.IntegrationContext;
@@ -40,6 +40,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -201,6 +202,8 @@ public class BookingConverter {
     }
 
     public static NetquallFinalCloseoutRequest convert(IntegrationContext ctx, ReceiptRequest request) {
+        BookingRegistryService bookingRegistryService = AppContext.getBean(BookingRegistryService.class);
+
         NetquallFinalCloseoutRequest finalCloseoutRequest  = new NetquallFinalCloseoutRequest();
         prepareGeneralState(finalCloseoutRequest, request);
         Booking booking = request.getBooking();
@@ -222,22 +225,66 @@ public class BookingConverter {
         bookingData.setRideType(NetquallRideType.BUSINESS);
         bookingData.setCurrencyCode(receipt.getCurrencyCode());
 
-        //TODO
-        bookingData.setDropOffTime(DateTime.now());
-        bookingData.setOnLocationTime(DateTime.now());
-        bookingData.setPassengerInCarTime(DateTime.now());
+        com.haulmont.shamrock.affiliate.integrations.core.services.dto.model.Booking shmBooking = bookingRegistryService.getExecutionStatus(UUID.fromString(request.getBookingReference().getMetadata().getAsString("booking_id")));
+        bookingData.setDropOffTime(shmBooking.getCompletionDate());
+        bookingData.setOnLocationTime(shmBooking.getArrivalDate());
+        bookingData.setPassengerInCarTime(shmBooking.getCollectionDate());
         //price
         bookingData.setRates(new NetquallRate());
-        NetquallRate rate = bookingData.getRates();
-        BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
-
-        //TODO
-        rate.setBaseFare(receipt.getBaseFare());
-        totalPrice = totalPrice.add(receipt.getBaseFare());
-
-        bookingData.setGrandTotal(totalPrice);
+        bookingData.setGrandTotal(accumulateRate(bookingData.getRates(), receipt));
 
         return finalCloseoutRequest;
+    }
+
+    private static BigDecimal accumulateRate(NetquallRate rate, Price receipt) {
+        BigDecimal totalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal unknownTotalPrice = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+
+        totalPrice = accumulateTotal(totalPrice, receipt::getBaseFare, rate::setBaseFare);
+        if (CollectionUtils.isNotEmpty(receipt.getAdjustments())) {
+            for (AbstractCharge a : receipt.getAdjustments()) {
+                if (a.getAmount() == null)
+                    continue;
+                switch (a.getType()) {
+                    case "PARKING":
+                        totalPrice = accumulateTotal(totalPrice, a::getAmount, rate::setParking);
+                        break;
+                    case "SERVICE_CHARGE":
+                        totalPrice = accumulateTotal(totalPrice, a::getAmount, rate::setServiceCharge);
+                    case "MAG":
+                        totalPrice = accumulateTotal(totalPrice, a::getAmount, rate::setMeetGreet);
+                        break;
+                    case "GFP":
+                        totalPrice = accumulateTotal(totalPrice, a::getAmount, rate::setCongestionSurcharge);
+                        break;
+                    default:
+                        unknownTotalPrice = unknownTotalPrice.add(a.getAmount());
+                        break;
+                }
+            }
+        }
+        BigDecimal tax = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        if (CollectionUtils.isNotEmpty(receipt.getTaxes())) {
+            for (AbstractCharge a : receipt.getTaxes()) {
+                if (a.getAmount() == null)
+                    continue;
+                tax = tax.add(a.getAmount());
+            }
+        }
+        rate.setTax(tax);
+        totalPrice = totalPrice.add(unknownTotalPrice).add(tax);
+        rate.setBaseFare(rate.getBaseFare().add(unknownTotalPrice));
+
+        return totalPrice;
+    }
+
+    private static BigDecimal accumulateTotal(BigDecimal total, Supplier<BigDecimal> value , Consumer<BigDecimal> consumer) {
+        BigDecimal v = value.get();
+        if  (v == null) {
+            v = BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        }
+        consumer.accept(v);
+        return total.add(v);
     }
 
     public static Booking convert(IntegrationContext ctx, NetquallBookingRequest netquallBookingRequest) {
