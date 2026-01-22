@@ -247,7 +247,8 @@ public class BookingConverter {
                     continue;
                 switch (a.getType()) {
                     case "PARKING":
-                        totalPrice = accumulateTotal(totalPrice, a::getAmount, rate::setParking);
+                    case "PARKING_FEE":
+                        totalPrice = accumulateTotal(totalPrice, ()-> safeValue(rate.getParking()).add(safeValue(a.getAmount())), rate::setParking);
                         break;
                     case "SERVICE_CHARGE":
                         totalPrice = accumulateTotal(totalPrice, a::getAmount, rate::setServiceCharge);
@@ -271,11 +272,21 @@ public class BookingConverter {
                 tax = tax.add(a.getAmount());
             }
         }
+
+        BigDecimal waitingTime = safeValue(receipt.getWaitingFare());
+        rate.setWaitTime(waitingTime);
+
         rate.setTax(tax);
-        totalPrice = totalPrice.add(unknownTotalPrice).add(tax);
+        totalPrice = totalPrice.add(unknownTotalPrice).add(tax).add(waitingTime);
         rate.setBaseFare(rate.getBaseFare().add(unknownTotalPrice));
 
         return totalPrice;
+    }
+
+    private static BigDecimal safeValue(BigDecimal amount) {
+        if (amount == null)
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        return amount.setScale(2, RoundingMode.HALF_UP);
     }
 
     private static BigDecimal accumulateTotal(BigDecimal total, Supplier<BigDecimal> value , Consumer<BigDecimal> consumer) {
