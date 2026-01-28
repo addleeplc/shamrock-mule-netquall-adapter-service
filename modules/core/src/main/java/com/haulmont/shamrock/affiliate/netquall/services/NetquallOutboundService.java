@@ -84,13 +84,18 @@ public class NetquallOutboundService {
         }
 
         @Override
+        protected Object body() {
+            return request;
+        }
+
+        @Override
         protected HttpRequest<?> createRequest(String url, Path path) {
             request.setCredentials(new NetquallCredentials(this.credentialsSupplier.get().getUser(), this.credentialsSupplier.get().getPassword()));
             request.getHeader().setMethod(method);
             request.getHeader().setChannelType(NetquallChannelType.CORPORATE_NETWORK);
             return post(url, path)
                     .header(HttpHeaders.CONTENT_TYPE, "application/json")
-                    .body(request);
+                    .body(body());
 
         }
 
